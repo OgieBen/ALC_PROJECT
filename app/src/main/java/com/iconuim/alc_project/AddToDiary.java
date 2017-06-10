@@ -1,5 +1,7 @@
 package com.iconuim.alc_project;
 
+import android.database.Cursor;
+import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +13,12 @@ public class AddToDiary extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_to_diary);
+
+
+
+
+
+
     }
 
     @Override
