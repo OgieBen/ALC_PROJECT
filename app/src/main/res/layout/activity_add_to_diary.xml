@@ -1,0 +1,133 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.iconuim.alc_final_project.Add_image">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="insideInset"
+        android:scrollbarFadeDuration="300"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="15dip"
+                android:layout_marginRight="16dp"
+                android:background="@android:drawable/dialog_holo_light_frame"
+                >
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="200dp"
+
+
+
+                    android:layout_gravity="center"
+
+                    android:src="@drawable/add_icon"
+                    android:id="@+id/add_icon" />
+            </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="15dip"
+            android:layout_marginRight="16dp"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            >
+
+
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Title"
+
+                android:layout_height="40dp" />
+
+
+            </LinearLayout>
+
+        <!--    <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/descriptionLabel"
+                android:layout_marginTop="10dp"
+                android:textSize="20sp"
+
+                android:fontFamily="monospace"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:textColor="#007FFF"
+
+                /> !-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="15dip"
+            android:layout_marginRight="16dp"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            >
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:inputType="textMultiLine|text"
+                android:gravity="left"
+                android:hint="Description"
+
+                android:lines="2"
+                android:scrollbars="vertical"
+                android:scrollbarSize="4dp"
+                android:fadeScrollbars="true"
+                android:scrollbarFadeDuration="300"
+
+                /> <!-- <requestFocus  /> !-->
+
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:text="Add to Diary"
+                android:background="@drawable/button2"
+                android:layout_margin="50dp"
+
+                android:layout_gravity="center"
+                android:textColor="#007FFF"
+
+                />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</RelativeLayout>
