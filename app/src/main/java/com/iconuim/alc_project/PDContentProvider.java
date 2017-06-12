@@ -44,7 +44,9 @@ public class PDContentProvider extends ContentProvider {
             case SIMPLE_ROW:
                 String rowId = uri.getPathSegments().get(1);
                 if(!TextUtils.isEmpty(selection))
-                    selection = tempID + "=" + rowId;
+                    selection = tempID + "=" + rowId + " AND " + selection;
+                else
+                selection = tempID + "=" + rowId;
             default:break;
         }
 
@@ -140,7 +142,10 @@ public class PDContentProvider extends ContentProvider {
             {
                 case SIMPLE_ROW:
                     String rowId = uri.getPathSegments().get(1);
-                   selection = tempID + " = " + rowId ;
+                    if(!TextUtils.isEmpty(selection))
+                        selection = tempID + "=" + rowId + " AND " + selection;
+                    else
+                        selection = tempID + "=" + rowId;
                 default:break;
             }
 

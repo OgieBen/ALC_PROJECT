@@ -11,7 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
     private static BackgroundUpdateService backgroundUpdateService;
     public static Intent intentUpdateService ;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+
+
 
     }
 
