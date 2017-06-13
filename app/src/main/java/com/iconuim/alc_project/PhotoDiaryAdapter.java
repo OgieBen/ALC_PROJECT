@@ -83,7 +83,7 @@ public class PhotoDiaryAdapter extends ArrayAdapter<DiaryStory> {
            // TextView descView = (TextView) diaryView.findViewById(R.id.descView);
           // ImageView imgView = (ImageView) diaryView.findViewById(R.id.imgView);
 
-          // titleView.setText(title);
+            // titleView.setText(title);
           // descView.setText(description);
             // imgView.setImageBitmap(image);
 
