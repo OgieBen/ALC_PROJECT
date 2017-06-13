@@ -2,8 +2,12 @@ package com.iconuim.alc_project;
 
 import android.app.ActionBar;
 import android.app.IntentService;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks
 {
 
     private static BackgroundUpdateService backgroundUpdateService;
@@ -20,7 +24,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
+        getLoaderManager().initLoader(0,null,this);
+
+
         ActionBar bar = getActionBar();
         if(bar != null)
             bar.setDisplayShowHomeEnabled(false);
@@ -44,6 +53,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 startActivity(it);
+                //refresh activity usung the new uri returned
             }
         });
 
@@ -71,5 +81,52 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+
+        CursorLoader loader = new CursorLoader(this, PDContentProvider.CONTENT_URI,null,null,null,null);
+
+
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+
+       //adapterBind should be done here
+        // for every cursor returned call newStory(description,title,imageUri)
+
+
+        //get db column
+      //  int keyTaskIndex = cursor.getColumnIndexOrThrow(ToDoContentProvider.KEY_TASK);
+
+        //clear refrence to prevoius array object
+        //todoItems.clear();
+
+        //iterate through the cursor
+      /*  while (cursor.moveToNext()) {
+            ToDoItem newItem = new ToDoItem(cursor.getString(keyTaskIndex));
+            todoItems.add(newItem);
+        }
+
+        */
+
+        //notify adapter about change
+
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(0,null, this);
     }
 }
