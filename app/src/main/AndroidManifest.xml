@@ -37,6 +37,16 @@
             android:enabled="true"
             android:exported="true" >
         </provider>
+
+        <receiver
+            android:name=".PDBroadcast"
+            android:enabled="true"
+
+            android:exported="true" >
+
+        </receiver>
+
+
     </application>
 
 </manifest>

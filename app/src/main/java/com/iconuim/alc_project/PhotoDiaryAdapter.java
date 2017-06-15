@@ -1,5 +1,6 @@
 package com.iconuim.alc_project;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import javax.xml.transform.URIResolver;
 
@@ -28,12 +30,15 @@ import javax.xml.transform.URIResolver;
  */
 public class PhotoDiaryAdapter extends ArrayAdapter<DiaryStory> {
     private static LinearLayout diaryView;
+    private static LinearLayout main;
     private static int resource;
+    private static Context context;
 
 
-    public PhotoDiaryAdapter(Context context, int _resource, List<DiaryStory> newStory) {
+    public PhotoDiaryAdapter(Context _context, int _resource, List<DiaryStory> newStory) {
         super(context, _resource);
         resource = _resource;
+        context = _context;
 
     }
 
@@ -41,15 +46,14 @@ public class PhotoDiaryAdapter extends ArrayAdapter<DiaryStory> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            diaryView = new LinearLayout(getContext());
+          diaryView = new LinearLayout(getContext());
             String inflater = Context.LAYOUT_INFLATER_SERVICE;
-            LayoutInflater li;
-            li = (LayoutInflater) getContext().getSystemService(inflater);
-            li.inflate(resource, diaryView, true);
+            LayoutInflater  li = (LayoutInflater) getContext().getSystemService(inflater);
+             li.inflate(resource, diaryView, true);
+          //  Inflater inflater1 = ((Activity)context).get;
 
-        }else{
-            diaryView = (LinearLayout) convertView;
         }
+
         DiaryStory diaryStory = getItem(position);
 
 
@@ -62,30 +66,25 @@ public class PhotoDiaryAdapter extends ArrayAdapter<DiaryStory> {
 
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-         String filePath;
-          ContentResolver contentResolver = getContext().getContentResolver();
+           String filePath;
+           ContentResolver contentResolver = getContext().getContentResolver();
 
-
-            Cursor cursor =  contentResolver.query(uri, filePathColumn, null, null, null);
-
-
-
+           Cursor cursor =  contentResolver.query(uri, filePathColumn, null, null, null);
 
            if(cursor.moveToFirst() ) {
                 int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
                filePath = cursor.getString(columnIndex);
                cursor.close();
 
+               Bitmap image = BitmapFactory.decodeFile(filePath);
 
+              //  ((TextView) diaryView.findViewById(android.R.id.text1).setText(););
+            // TextView descView = (TextView) diaryView.findViewById(R.id.descView);
+              // ImageView imgView = (ImageView) diaryView.findViewById(R.id.imageView);
 
-            Bitmap image = BitmapFactory.decodeFile(filePath);
-            //  TextView titleView = (TextView) diaryView.findViewById(R.id.titleView);
-           // TextView descView = (TextView) diaryView.findViewById(R.id.descView);
-          // ImageView imgView = (ImageView) diaryView.findViewById(R.id.imgView);
-
-            // titleView.setText(title);
-          // descView.setText(description);
-            // imgView.setImageBitmap(image);
+            //   titleView.setText(title);
+            // descView.setText(description);
+             //  imgView.setImageBitmap(image);
 
 
 

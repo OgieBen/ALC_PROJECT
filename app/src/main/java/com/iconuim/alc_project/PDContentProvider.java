@@ -87,7 +87,7 @@ public class PDContentProvider extends ContentProvider {
         if(res > -1)
         {
             Uri id = ContentUris.withAppendedId(CONTENT_URI,res);
-            getContext().getContentResolver().notifyChange(id, null);
+            //getContext().getContentResolver().notifyChange(id, null);
             return id ;
         }
         return null;
@@ -123,6 +123,7 @@ public class PDContentProvider extends ContentProvider {
               sqLiteQueryBuilder.appendWhere(tempID +" = "  + rowId);
 
           }
+        //direct overide
         sqLiteQueryBuilder.setTables(tempTableName);
 
         Cursor cursor =  sqLiteQueryBuilder.query(db,projection,selection,selectionArgs,null,null,sortOrder);

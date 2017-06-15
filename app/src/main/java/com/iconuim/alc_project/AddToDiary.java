@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import static android.app.PendingIntent.getActivities;
@@ -36,7 +37,14 @@ public class AddToDiary extends AppCompatActivity  {
     private static Button addButton;
     public static ContentValues CONTENT_VALUES ;
 
+    public static final String DESCRIPTION = "description";
+    public static final String TITLE = "title";
+    public static final String IMAGE = "image_url";
+
+
+
     private static String imageRef;
+    public static String asyncString ="None";
 
     private static PDContentProvider pdContentProvider = new PDContentProvider();
 
@@ -84,7 +92,7 @@ public class AddToDiary extends AppCompatActivity  {
 
 
                 if(!TextUtils.isEmpty(descriptionText)) {
-                    contentValues.put(PDDBOpenHelper.TITLE_COLUMN, descriptionText);
+                    contentValues.put(PDDBOpenHelper.DESCRIPTION_COLUMN, descriptionText);
                     trck++;
                 }else {
                     Toast toast = Toast.makeText(getApplication(), "Description cannot be Empty", Toast.LENGTH_LONG);
@@ -108,9 +116,26 @@ public class AddToDiary extends AppCompatActivity  {
                 if(trck == 3)
                 {
                  ///   CONTENT_VALUES = contentValues;
-                     AsyncUpdate asyncUpdate =new AsyncUpdate();
-                    asyncUpdate.execute(contentValues);
+                    TextView text = (TextView) findViewById(R.id.testView);
+                     AsyncUpdate asyncUpdate = new AsyncUpdate(text);
+                     asyncUpdate.execute(contentValues);
 
+
+                   // Intent resIntent = new Intent(PDBroadcast.SEND_INPUT_DATA_ACTION);
+                   // resIntent.putExtra(DESCRIPTION, descriptionText);
+                  //  resIntent.putExtra(TITLE, titleText);
+                   // resIntent.putExtra(IMAGE, imageRef);
+                    Log.e("async ", asyncString);
+
+                    Toast.makeText(AddToDiary.this, text.getText(), Toast.LENGTH_LONG).show();
+
+                    // sendBroadcast(resIntent);
+                    // sendBroadcast(resIntent);
+                    // MainActivity.diaryStories.add(new DiaryStory(descriptionText, titleText, imageRef));
+                   //  MainActivity.photoDiaryAdapter.notifyDataSetChanged();
+
+
+                       finish();
                 }
 
 
@@ -191,6 +216,8 @@ public class AddToDiary extends AppCompatActivity  {
     public AddToDiary() {
         super();
     }
+
+
 
 
 }
