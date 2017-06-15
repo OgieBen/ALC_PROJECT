@@ -58,6 +58,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          ListView listView =  (ListView) findViewById(android.R.id.list);
          listView.setAdapter(myAdapter);
 
+         ImageView addStories = (ImageView) findViewById(R.id.add_icon);
+         final Intent intent = new Intent(this,AddToDiary.class);
+         addStories.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 startActivity(intent);
+             }
+         });
+
     }
 
 

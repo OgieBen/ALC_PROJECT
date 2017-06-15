@@ -17,6 +17,7 @@
     android:layout_height="wrap_content"
     android:background="#cdcdcd"
     android:layout_marginTop="0dp"
+    android:layout_marginBottom="0dp"
     android:gravity="center"
     android:text="Title"
     android:textSize="18sp"
@@ -28,10 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-
-
         android:layout_gravity="center"
-
         android:id="@android:id/icon" />
 
 
