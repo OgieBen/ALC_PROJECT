@@ -45,7 +45,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,8 +68,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
      private static int PIC_CAPTURE_INTENT = 300;
      private static int SAVE_FILE = 400;
-     MyAdapter myAdapter;
      private static ProgressDialog dialog;
+     MyAdapter myAdapter;
+
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
@@ -142,103 +145,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      @Override
      public void onLoaderReset(Loader loader) {
      }
-
-    private class MyAdapter extends ArrayAdapter<String> {
-
-
-        private int resource;
-        private ArrayList<String>  titles;
-        private ArrayList<String> img;
-        private ArrayList<String> description;
-        Boolean bool = false;
-
-
-        public MyAdapter(Context context, int _resource, ArrayList<String> _titles,ArrayList<String> _img, ArrayList<String> _description) {
-            super(context, _resource, _titles);
-            resource =_resource;
-           titles = _titles;
-            img = _img;
-            description = _description;
-
-
-        }
-
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup container) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(resource, container, false);
-
-
-            }
-
-
-            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View dView = inflater.inflate(R.layout.details_dialog,null);
-            builder.create();
-            builder.setView(dView);
-
-
-            {
-                Uri uri = Uri.parse(img.get(position));
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                String filePath;
-                ContentResolver contentResolver = getContentResolver();
-                Cursor cur = contentResolver.query(uri, filePathColumn, null, null, null);
-
-                if (cur.moveToFirst()) {
-                    int columnIndex = cur.getColumnIndexOrThrow(filePathColumn[0]);
-                    filePath = cur.getString(columnIndex);
-                    cur.close();
-
-                    Bitmap image = BitmapFactory.decodeFile(filePath);
-                    ImageView addImage = ((ImageView) convertView.findViewById(android.R.id.icon));
-                    addImage.setImageBitmap(image);
-
-                    ((ImageView) dView.findViewById(R.id.dialogImage)).setImageBitmap(image);
-                    ((TextView) dView.findViewById(R.id.dialogTitleText))
-                            .setText(titles.get(position));
-                    ((TextView) dView.findViewById(R.id.dialogDescriptionText))
-                            .setText(description.get(position));
-
-
-
-                    if (bool == false) {
-                        addImage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                              /*  builder.show();
-                                bool = true; */
-
-
-                            }
-
-                        });
-                    }else{
-
-                    }
-                }
-
-            }
-
-
-
-
-                ((TextView) convertView.findViewById(android.R.id.text1))
-                        .setText(titles.get(position));
-            if(!dView.hasFocus())
-            {
-                dView.onFinishTemporaryDetach();
-            }
-
-            return convertView;
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -333,4 +239,111 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          }
 
      }
+
+    private class MyAdapter extends ArrayAdapter<String> {
+
+
+        Boolean bool = false;
+        private int resource;
+        private ArrayList<String>  titles;
+        private ArrayList<String> img;
+        private ArrayList<String> description;
+
+
+        public MyAdapter(Context context, int _resource, ArrayList<String> _titles,ArrayList<String> _img, ArrayList<String> _description) {
+            super(context, _resource, _titles);
+            resource =_resource;
+           titles = _titles;
+            img = _img;
+            description = _description;
+
+
+        }
+
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup container) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(resource, container, false);
+
+
+            }
+
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            View dView = inflater.inflate(R.layout.details_dialog,null);
+            builder.create();
+            builder.setView(dView);
+
+
+            {
+                Uri uri = Uri.parse(img.get(position));
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+                String filePath;
+                ContentResolver contentResolver = getContentResolver();
+                Cursor cur = contentResolver.query(uri, filePathColumn, null, null, null);
+
+                if (cur.moveToFirst()) {
+                    int columnIndex = cur.getColumnIndexOrThrow(filePathColumn[0]);
+                    filePath = cur.getString(columnIndex);
+                    cur.close();
+
+                    try {
+                        InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+                        Bitmap image = BitmapFactory.decodeStream(inputStream);
+                        ImageView addImage = ((ImageView) convertView.findViewById(android.R.id.icon));
+                        ((ImageView) dView.findViewById(R.id.dialogImage)).setImageBitmap(image);
+                        addImage.setImageBitmap(image);
+
+                    }catch (FileNotFoundException e){
+
+                        Toast toast = Toast.makeText(MainActivity.this,"Image File could not be retrieved",Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER,0,0);
+                        toast.show();
+
+                    }
+
+
+                    ((TextView) dView.findViewById(R.id.dialogTitleText))
+                            .setText(titles.get(position));
+                    ((TextView) dView.findViewById(R.id.dialogDescriptionText))
+                            .setText(description.get(position));
+
+
+
+                     /* if (bool == false) {
+                        addImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                              builder.show();
+                                bool = true;
+
+
+                            }
+
+                        });
+                    }else{
+
+                    } */
+                }
+
+            }
+
+
+
+
+                ((TextView) convertView.findViewById(android.R.id.text1))
+                        .setText(titles.get(position));
+            if(!dView.hasFocus())
+            {
+                dView.onFinishTemporaryDetach();
+            }
+
+            return convertView;
+        }
+    }
  }

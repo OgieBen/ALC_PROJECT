@@ -10,19 +10,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class PDDBOpenHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "PHOTO_DIARY.db";
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 7;
 
     public static final String IMAGE_TABLE ="ImageTable";
     public static final String TAGGED_PERSONS_TABLE = "TaggedPerson";
-
-    private static final String DROP_DATABASE = "DROP TABLE " + IMAGE_TABLE;
-
     public static final String IMAGE_ID_COLUMN ="_id";
     public static final String TITLE_COLUMN = "TITLE";
     public static final String DESCRIPTION_COLUMN ="DESCRIPTION";
     public static final String IMAGE_PATH_REF_COLUMN ="IMAGE_PATH_REF";
-
-
     public static final String TAGGED_PERSONS_ID = "_id";
     public static final String FIRST_NAME_COLUMN ="FIRST_NAME";
     public static final String LAST_NAME_COLUMN = "LAST_NAME";
@@ -30,7 +25,7 @@ public class PDDBOpenHelper extends SQLiteOpenHelper {
     public static final String DATA_X_POSITION_COLUMN = "DATA_X_POSITION";
     public static final String DATA_Y_POSITION_COLUMN = "DATA_Y_POSITION";
     public static final String SUB_WINDOW_SIZE_COLUMN = "SUB_WINDOW_SIZE";
-
+    private static final String DROP_DATABASE = "DROP TABLE " + IMAGE_TABLE;
     private static final String CREATE_IMAGE_TABLE =
             "create table " + IMAGE_TABLE + " ("
             + IMAGE_ID_COLUMN + " integer primary key autoincrement, "
@@ -69,7 +64,10 @@ public class PDDBOpenHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
-
-
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+       // super.onDowngrade(db, oldVersion, newVersion);
+        db.execSQL(DROP_DATABASE);
+        onCreate(db);
+    }
 }

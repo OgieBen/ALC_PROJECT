@@ -31,7 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -40,34 +42,31 @@ import static android.app.PendingIntent.getActivity;
 
 public class AddToDiary extends AppCompatActivity  {
 
+    public static final String DESCRIPTION = "description";
+    public static final String TITLE = "title";
+    public static final String IMAGE = "image_url";
     private static final int PICK_IMAGE = 1;
+    private static final int PIC_CAPTURE_INTENT = 300;
+    private static final int SAVE_FILE = 400;
+    public static ContentValues CONTENT_VALUES ;
+    public static String asyncString ="None";
     private static Bitmap selectedImage;
     private static ImageView addImageView;
     private static EditText title;
     private static EditText description;
     private static Button addButton;
-    public static ContentValues CONTENT_VALUES ;
-
-    public static final String DESCRIPTION = "description";
-    public static final String TITLE = "title";
-    public static final String IMAGE = "image_url";
-
-
-
     private static String imageRef;
-    public static String asyncString ="None";
-
     private static PDContentProvider pdContentProvider = new PDContentProvider();
-
    // private static String [] TABLE_COLUMS = {}
     private static ContentValues contentValues = new ContentValues();
-
-    SoundPool   soundPool;
-    int notification;
-    private static final int PIC_CAPTURE_INTENT = 300;
-    private static final int SAVE_FILE = 400;
    private static File imageFile;
     private static  String path;
+    SoundPool   soundPool;
+    int notification;
+
+    public AddToDiary() {
+        super();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,16 +84,16 @@ public class AddToDiary extends AppCompatActivity  {
         {
 
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
                     .build();
 
-                    soundPool = new SoundPool.Builder()
+            soundPool = new SoundPool.Builder()
                                 .setAudioAttributes(audioAttributes)
                                 .setMaxStreams(1)
                                 .build();
-                                int notification  = soundPool.load(AddToDiary.this, R.raw.arpeggio, 1);
+            notification  = soundPool.load(AddToDiary.this, R.raw.arpeggio, 1);
                                 soundPool.play(notification,1,1,0,0,1);
 
         }else{
@@ -245,8 +244,6 @@ public class AddToDiary extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -254,40 +251,75 @@ public class AddToDiary extends AppCompatActivity  {
         switch (requestCode) {
 
             case PICK_IMAGE:
-
                 if (resultCode == RESULT_OK) {
+                      Uri dataUri;
+                  /*  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
 
-                    Uri dataUri = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                        dataUri = (Uri) data.getParcelableExtra(Intent.EXTRA_INTENT);
 
-                    Cursor cursor = getContentResolver().query(dataUri, filePathColumn, null, null, null);
-                    imageRef = dataUri.toString();
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    String filePath = cursor.getString(columnIndex);
-                    cursor.close();
+                    }else {
+                        dataUri = data.getData();
+                    } */
 
 
-                    BitmapFactory.Options opt = new BitmapFactory.Options();
-                    opt.inScreenDensity = 60;
-                  //  int picWidth = opt.outWidth;
-                   // int picHeight = opt.outHeight;
-                    //int scaleFactor = Math.min(picWidth / targetW, picHeight / targetH);
-                   // opt.inSampleSize = scaleFactor;
+                   // dataUri = (Uri) data.getParcelableExtra(Intent.EXTRA_STREAM);
+                       dataUri = data.getData();
+                     if( dataUri != null) {
+                         //
+                         String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                    // bm.compress(Bitmap.CompressFormat.PNG, 100, ostream);
-                    selectedImage = BitmapFactory.decodeFile(filePath, opt);
-                    //int x  = addImage.getMeasuredWidth();
-                    // int y  = addImage.getMeasuredHeight();
-                    //   Log.e("width", "" + x);
-                    // Log.e("  ", ""+y);
-                    // selectedImage = Bitmap.createScaledBitmap(selectedImage, addImage., y, true);
-                    //selectedImage =
-                    addImageView.setImageBitmap(selectedImage);
+                         Cursor cursor = getContentResolver().query(dataUri, filePathColumn, null, null, null);
+                         imageRef = dataUri.toString();
+                         cursor.moveToFirst();
+
+                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                         String filePath = cursor.getString(columnIndex);
+                         cursor.close();
 
 
-                }
+                         BitmapFactory.Options opt = new BitmapFactory.Options();
+                       //  opt.inScreenDensity = 60;
+                         //  int picWidth = opt.outWidth;
+                         // int picHeight = opt.outHeight;
+                         //int scaleFactor = Math.min(picWidth / targetW, picHeight / targetH);
+                         // opt.inSampleSize = scaleFactor;
+                         opt.inJustDecodeBounds= false;
+
+                         // bm.compress(Bitmap.CompressFormat.PNG, 100, ostream);
+                         try {
+                             InputStream input = this.getContentResolver().openInputStream(dataUri);
+                             selectedImage = BitmapFactory.decodeStream(input, null, opt);
+                         }catch(FileNotFoundException e)
+                         {
+                             Toast toast = Toast.makeText(AddToDiary.this,"Image File could not be retrieved",Toast.LENGTH_SHORT);
+                             toast.setGravity(Gravity.CENTER,0,0);
+                             toast.show();
+                         }
+
+
+
+                         //int x  = addImage.getMeasuredWidth();
+                         // int y  = addImage.getMeasuredHeight();
+                         //   Log.e("width", "" + x);
+                         // Log.e("  ", ""+y);
+                         // selectedImage = Bitmap.createScaledBitmap(selectedImage, addImage., y, true);
+                         //selectedImage =
+                         if(dataUri != null) {
+                             addImageView.setImageBitmap(selectedImage);
+
+                         }
+
+                     }else{
+                         Toast toast = Toast.makeText(AddToDiary.this,"System Error Please try again",Toast.LENGTH_SHORT);
+                         toast.setGravity(Gravity.CENTER,0,0);
+                         toast.show();
+                     }
+
+                } else{
+            Toast toast = Toast.makeText(AddToDiary.this,"Please Pick an Image file",Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER,0,0);
+            toast.show();
+        }
                 break;
             case PIC_CAPTURE_INTENT:
 
@@ -325,11 +357,6 @@ public class AddToDiary extends AppCompatActivity  {
                 break;
         }
 
-    }
-
-
-    public AddToDiary() {
-        super();
     }
 
 
