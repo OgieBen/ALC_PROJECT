@@ -35,6 +35,15 @@ public class BackgroundUpdateService extends IntentService {
     public static final String IMAGE_PATH_REF_COLUMN ="IMAGE_PATH_REF";
 
     private static final String  [] res = new String[]{IMAGE_ID_COLUMN,TITLE_COLUMN,DESCRIPTION_COLUMN,IMAGE_PATH_REF_COLUMN};
+    private static final SQLiteDatabase.CursorFactory fac =  new SQLiteDatabase.CursorFactory() {
+        @Override
+        public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
+            return null;
+        }
+    };
+    // TODO: Rename parameters
+    private static final String EXTRA_PARAM1 = "com.iconuim.alc_project.extra.PARAM1";
+    private static final String EXTRA_PARAM2 = "com.iconuim.alc_project.extra.PARAM2";
     private static String [] tempColumns ;
     private static String [] tempData;
     private static String tempWhereClause;
@@ -43,24 +52,15 @@ public class BackgroundUpdateService extends IntentService {
     private static String tempSelectionWhere;
     private static String [] tempSelectionArgs;
     private static Cursor cursor;
-
-
     private static ContentValues contentValues;
-
-    private static final SQLiteDatabase.CursorFactory fac =  new SQLiteDatabase.CursorFactory() {
-        @Override
-        public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver masterQuery, String editTable, SQLiteQuery query) {
-            return null;
-        }
-    };
     private static   PDDBOpenHelper pddbOpenHelper;
     private static SQLiteDatabase dbInsert ;
     private static SQLiteDatabase dbUpdate ;
     private static SQLiteDatabase dbSelect ;
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.iconuim.alc_project.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.iconuim.alc_project.extra.PARAM2";
+    public BackgroundUpdateService() {
+        super("BackgroundUpdateService");
+    }
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -105,70 +105,12 @@ public class BackgroundUpdateService extends IntentService {
         context.startService(intent);
     }
 
-    public BackgroundUpdateService() {
-        super("BackgroundUpdateService");
-    }
-
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-          //  final String insert = intent.getStringExtra(ACTION_INSERT);
-            //insert into db
-            if (ACTION_INSERT.equals(action)) {
-
-                try {
-                    dbInsert = pddbOpenHelper.getReadableDatabase();
-                }catch(SQLiteException e){
-                    dbInsert = pddbOpenHelper.getWritableDatabase();
-
-                }
-                  final String tableName = intent.getStringExtra(ACTION_TABLE_NAME);
-                int i =0;
-                for(String tmpData : tempData )
-                    contentValues.put(tempColumns[i++],tmpData);
-
-                long res = dbInsert.insert(tableName,null,contentValues);
-
-                contentValues.clear();
-
-            } else if (ACTION_UPDATE.equals(action)) {
-
-                final String update = intent.getStringExtra(ACTION_UPDATE);
-                try {
-                    dbUpdate = pddbOpenHelper.getWritableDatabase();
-                }catch(SQLiteException e){
-
-                    //review the documentation of getReadableDatabase();
-                    dbUpdate = pddbOpenHelper.getReadableDatabase();
-                }
-                  int i =0;
-                for(String tmpData : tempData )
-                    contentValues.put(tempColumns[i++],tmpData);
-
-                long res = dbUpdate.update(ACTION_TABLE_NAME,contentValues,tempWhereClause,tempWhereArgs);
-                contentValues.clear();
-
-            }else if(ACTION_SELECT.equals(action))
-            {
-                final String update = intent.getStringExtra(ACTION_SELECT);
-                try {
-                    dbSelect = pddbOpenHelper.getWritableDatabase();
-                }catch(SQLiteException e){
-
-                    //review the documentation of getReadableDatabase();
-                    dbSelect = pddbOpenHelper.getReadableDatabase();
-                }
-
-                int i =0;
-                for(String tmpData : tempData )
-                    contentValues.put(tempColumns[i++],tmpData);
-
-                 cursor = dbSelect.query(ACTION_TABLE_NAME,tempColumns,tempSelection,tempSelectionArgs,null,null,null);
 
 
-            }
-        }
+
+
     }
 
     /**
@@ -200,47 +142,6 @@ public class BackgroundUpdateService extends IntentService {
     }
 
 
-    public void setData(String [] data)
-    {
-        tempData = data;
-    }
-
-    public void setColumns(String[] columns)
-    {
-        tempColumns = columns;
-    }
-
-    public void setWhere(String whereClause)
-    {
-        tempWhereClause = whereClause;
-    }
-
-    public void setWhereArgs(String [] whereArgs)
-    {
-        tempWhereArgs = whereArgs;
-    }
-
-
-    public void setSeletion(String selection)
-    {
-        tempSelection = selection;
-    }
-
-    public void setSelectionWhere(String selectionWhere)
-    {
-        tempSelectionWhere = selectionWhere;
-    }
-
-
-    public void setSelectionArg( String [] selectionArgs)
-    {
-        tempSelectionArgs =  selectionArgs;
-    }
-
-    public Cursor getCursor()
-    {
-        return cursor;
-    }
 
 
 }

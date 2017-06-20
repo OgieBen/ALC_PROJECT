@@ -36,6 +36,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      private static ProgressDialog dialog;
      MyAdapter myAdapter;
 
+
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
@@ -90,6 +92,53 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          getLoaderManager().initLoader(0, null, this);
 
          ListView listView =  (ListView) findViewById(android.R.id.list);
+
+
+
+         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+             @Override
+             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                 final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                 LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+                 View  dView = inflater.inflate(R.layout.details_dialog,null);
+                 builder.create();
+                 builder.setView(dView);
+
+
+                 Uri uri = Uri.parse(images.get(position));
+
+                 if( images.size() != 0 && description.size() != 0 && titles.size() != 0 ) {
+
+                     try {
+                         InputStream inputStream = getContentResolver().openInputStream(uri);
+                         Bitmap image = BitmapFactory.decodeStream(inputStream);
+
+                         ((TextView) dView.findViewById(R.id.dialogTitleText))
+                                 .setText(titles.get(position));
+                         ((TextView) dView.findViewById(R.id.dialogDescriptionText))
+                                 .setText(description.get(position));
+                         ((ImageView) dView.findViewById(R.id.dialogImage)).setImageBitmap(image);
+                         builder.show();
+                     } catch (FileNotFoundException e) {
+                         Toast toast = Toast.makeText(MainActivity.this, "Image File could not be retrieved", Toast.LENGTH_SHORT);
+                         toast.setGravity(Gravity.CENTER, 0, 0);
+                         toast.show();
+                     }
+                 }
+
+
+
+             /*    Toast toast = Toast.makeText(MainActivity.this," "+ images.size() +" "+ description.size()  +" "+ titles.size(), Toast.LENGTH_SHORT);
+                 toast.setGravity(Gravity.CENTER, 0, 0);
+                 toast.show(); */
+
+
+
+
+
+             }
+         });
          listView.setAdapter(myAdapter);
 
          ImageView addStories = (ImageView) findViewById(R.id.add_icon);
@@ -270,14 +319,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
 
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
-            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
-            View dView = inflater.inflate(R.layout.details_dialog,null);
-            builder.create();
-            builder.setView(dView);
-
-
             {
                 Uri uri = Uri.parse(img.get(position));
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -296,7 +337,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
                         Bitmap image = BitmapFactory.decodeStream(inputStream);
                         ImageView addImage = ((ImageView) convertView.findViewById(android.R.id.icon));
-                        ((ImageView) dView.findViewById(R.id.dialogImage)).setImageBitmap(image);
                         addImage.setImageBitmap(image);
 
                     }catch (FileNotFoundException e){
@@ -308,28 +348,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     }
 
 
-                    ((TextView) dView.findViewById(R.id.dialogTitleText))
-                            .setText(titles.get(position));
-                    ((TextView) dView.findViewById(R.id.dialogDescriptionText))
-                            .setText(description.get(position));
 
-
-
-                     /* if (bool == false) {
-                        addImage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                              builder.show();
-                                bool = true;
-
-
-                            }
-
-                        });
-                    }else{
-
-                    } */
                 }
 
             }
@@ -339,10 +358,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 ((TextView) convertView.findViewById(android.R.id.text1))
                         .setText(titles.get(position));
-            if(!dView.hasFocus())
-            {
-                dView.onFinishTemporaryDetach();
-            }
 
             return convertView;
         }
