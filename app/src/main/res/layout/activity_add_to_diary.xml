@@ -39,7 +39,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
                     android:layout_gravity="center"
-                    android:src="@drawable/add_icon"
+                    android:src="@drawable/image_placeholder"
                     android:id="@+id/add_icon" />
             </LinearLayout>
 
@@ -82,15 +82,15 @@
                 android:layout_marginRight="20dp"
                 android:textColor="#007FFF"
 
-                /> !-->
+                />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/testView"
 
-                android:text="NONE"
-                />
+                android:text=""
+                />!-->
 
         <LinearLayout
             android:layout_width="match_parent"

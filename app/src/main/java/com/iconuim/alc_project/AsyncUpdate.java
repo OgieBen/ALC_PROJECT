@@ -19,8 +19,8 @@ import java.sql.SQLException;
 public class AsyncUpdate  extends AsyncTask<ContentValues, Integer ,String> {
 
      TextView view;
-    public AsyncUpdate(TextView _view) {
-       view =_view;
+    public AsyncUpdate() {
+       //view =_view;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class AsyncUpdate  extends AsyncTask<ContentValues, Integer ,String> {
 
              }catch(SQLiteException e)
              {
-                 Log.e("Error",""+e);
+                 Log.e("Error","Error: Could not update DB :: "+e);
              }
 
 
@@ -59,7 +59,7 @@ public class AsyncUpdate  extends AsyncTask<ContentValues, Integer ,String> {
 
        if(!TextUtils.isEmpty(s)){
             AddToDiary.asyncString = s;
-           view.setText(s);
+          // view.setText(s);
 
         }
 

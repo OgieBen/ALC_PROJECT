@@ -6,9 +6,15 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +30,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import static android.app.PendingIntent.getActivities;
 import static android.app.PendingIntent.getActivity;
 
@@ -31,7 +42,7 @@ public class AddToDiary extends AppCompatActivity  {
 
     private static final int PICK_IMAGE = 1;
     private static Bitmap selectedImage;
-    private static ImageView addImage;
+    private static ImageView addImageView;
     private static EditText title;
     private static EditText description;
     private static Button addButton;
@@ -51,25 +62,54 @@ public class AddToDiary extends AppCompatActivity  {
    // private static String [] TABLE_COLUMS = {}
     private static ContentValues contentValues = new ContentValues();
 
+    SoundPool   soundPool;
+    int notification;
+    private static final int PIC_CAPTURE_INTENT = 300;
+    private static final int SAVE_FILE = 400;
+   private static File imageFile;
+    private static  String path;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_to_diary);
 
 
-         addImage = (ImageView) findViewById(R.id.add_icon);
+         addImageView = (ImageView) findViewById(R.id.add_icon);
         title = (EditText)findViewById(R.id.titleEntry);
         description = (EditText) findViewById(R.id.description);
 
         addButton = (Button) findViewById(R.id.addButton);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
 
-        addImage.setOnClickListener(new View.OnClickListener() {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+                    .build();
+
+                    soundPool = new SoundPool.Builder()
+                                .setAudioAttributes(audioAttributes)
+                                .setMaxStreams(1)
+                                .build();
+                                int notification  = soundPool.load(AddToDiary.this, R.raw.arpeggio, 1);
+                                soundPool.play(notification,1,1,0,0,1);
+
+        }else{
+            soundPool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION,1);
+            notification  = soundPool.load(this,R.raw.arpeggio,1);
+        }
+
+        addImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, PICK_IMAGE);
+                if(galleryIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(galleryIntent, PICK_IMAGE);
+                }
             }
         });
 
@@ -112,28 +152,23 @@ public class AddToDiary extends AppCompatActivity  {
                     return;
                 }
 
-
                 if(trck == 3)
                 {
-                 ///   CONTENT_VALUES = contentValues;
-                    TextView text = (TextView) findViewById(R.id.testView);
-                     AsyncUpdate asyncUpdate = new AsyncUpdate(text);
+
+                //    TextView text = (TextView) findViewById(R.id.testView); //for debug purposes
+                     AsyncUpdate asyncUpdate = new AsyncUpdate();
                      asyncUpdate.execute(contentValues);
 
+                    soundPool.play(notification, 1, 1, 0, 0, 1);
 
-                   // Intent resIntent = new Intent(PDBroadcast.SEND_INPUT_DATA_ACTION);
-                   // resIntent.putExtra(DESCRIPTION, descriptionText);
-                  //  resIntent.putExtra(TITLE, titleText);
-                   // resIntent.putExtra(IMAGE, imageRef);
-                    Log.e("async ", asyncString);
+                  //  Log.e("async ", asyncString);
 
-                    Toast.makeText(AddToDiary.this, text.getText(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddToDiary.this, "Memory Added to Diary", Toast.LENGTH_LONG).show();
 
                     // sendBroadcast(resIntent);
                     // sendBroadcast(resIntent);
                     // MainActivity.diaryStories.add(new DiaryStory(descriptionText, titleText, imageRef));
                    //  MainActivity.photoDiaryAdapter.notifyDataSetChanged();
-
 
                        finish();
                 }
@@ -160,8 +195,51 @@ public class AddToDiary extends AppCompatActivity  {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch(id)
+        {
+            case  R.id.action_settings:
+                return true;
+            case R.id.cam:
+
+
+                // if(hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(intent.resolveActivity(getPackageManager())!= null) {
+
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String imageFileName = "JPEG_" + timeStamp + "_";
+                    try {
+                        File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                        imageFile = File.createTempFile(imageFileName, ".jpg", storage);
+                         path = imageFile.getAbsolutePath();
+                      //  Log.e(" ", "++++++" + path);
+
+
+                    }catch (IOException e)
+                    {
+
+                    }
+
+
+                    if(imageFile != null) {
+                        Uri imageUri = FileProvider.getUriForFile(this, "com.iconuim.alc_project.fileprovider", imageFile);
+                        Log.e(""," -----"+imageUri);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                        //  startActivityForResult(intent, SAVE_FILE);
+
+                              /*  Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                File openImagefile = new File(path);
+                                Uri imageFileUri = Uri.fromFile(openImagefile);
+                                mediaScanIntent.setData(imageFileUri);
+                                this.sendBroadcast(mediaScanIntent);
+                                */
+
+                    }
+                    startActivityForResult(intent, PIC_CAPTURE_INTENT);
+
+                }
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -175,8 +253,10 @@ public class AddToDiary extends AppCompatActivity  {
 
         switch (requestCode) {
 
-            case PICK_IMAGE :
+            case PICK_IMAGE:
+
                 if (resultCode == RESULT_OK) {
+
                     Uri dataUri = data.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
@@ -188,27 +268,62 @@ public class AddToDiary extends AppCompatActivity  {
                     String filePath = cursor.getString(columnIndex);
                     cursor.close();
 
+
                     BitmapFactory.Options opt = new BitmapFactory.Options();
                     opt.inScreenDensity = 60;
+                  //  int picWidth = opt.outWidth;
+                   // int picHeight = opt.outHeight;
+                    //int scaleFactor = Math.min(picWidth / targetW, picHeight / targetH);
+                   // opt.inSampleSize = scaleFactor;
 
-
-
-
-
-                   // bm.compress(Bitmap.CompressFormat.PNG, 100, ostream);
+                    // bm.compress(Bitmap.CompressFormat.PNG, 100, ostream);
                     selectedImage = BitmapFactory.decodeFile(filePath, opt);
                     //int x  = addImage.getMeasuredWidth();
-                   // int y  = addImage.getMeasuredHeight();
-                 //   Log.e("width", "" + x);
-                   // Log.e("  ", ""+y);
-                   // selectedImage = Bitmap.createScaledBitmap(selectedImage, addImage., y, true);
-                          //selectedImage =
-                     addImage.setImageBitmap(selectedImage);
+                    // int y  = addImage.getMeasuredHeight();
+                    //   Log.e("width", "" + x);
+                    // Log.e("  ", ""+y);
+                    // selectedImage = Bitmap.createScaledBitmap(selectedImage, addImage., y, true);
+                    //selectedImage =
+                    addImageView.setImageBitmap(selectedImage);
+
 
                 }
+                break;
+            case PIC_CAPTURE_INTENT:
 
+
+                if (resultCode == RESULT_OK) {
+                   String dat = data.getStringExtra(MediaStore.EXTRA_OUTPUT);
+                    if (path == null) {
+                        Log.e("","Path: "+ dat);
+                        return;
+                    }
+                    Log.e("","Path: "+ path);
+                    int targetW = addImageView.getWidth();
+                    int targetH = addImageView.getHeight();
+
+                    // Get the dimensions of the bitmap
+                    BitmapFactory.Options Opt = new BitmapFactory.Options();
+                    Opt.inScreenDensity = 60;
+                    BitmapFactory.decodeFile(path, Opt);
+                    int picWidth = Opt.outWidth;
+                    int picHeight = Opt.outHeight;
+
+                    // Scale image
+                   // int scaleFactor = Math.min(picWidth / targetW, picHeight / targetH);
+
+                    // Decode the image file into a Bitmap sized to fill the View
+                   // bmOptions.inJustDecodeBounds = false;
+                   // bmOptions.inSampleSize = scaleFactor;
+
+
+                    Bitmap bitmap = BitmapFactory.decodeFile(path, Opt);
+                    addImageView.setImageBitmap(bitmap);
+
+
+                }
+                break;
         }
-
 
     }
 

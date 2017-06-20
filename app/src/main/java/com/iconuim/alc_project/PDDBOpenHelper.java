@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class PDDBOpenHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "PHOTO_DIARY.db";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
 
     public static final String IMAGE_TABLE ="ImageTable";
     public static final String TAGGED_PERSONS_TABLE = "TaggedPerson";

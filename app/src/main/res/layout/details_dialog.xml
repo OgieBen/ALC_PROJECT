@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:padding="0dp"
+    android:layout_margin="0dp"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+
+            >
+
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:src="@drawable/image_placeholder"
+                android:id="@+id/dialogImage"
+                android:background="@android:drawable/dialog_holo_light_frame"
+                android:scaleType="fitXY"
+
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginLeft="16dp"
+
+
+                    >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="34sp"
+                        android:text="Title: "
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif"
+
+
+
+                        />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="34sp"
+                        android:text=""
+                        android:id="@+id/dialogTitleText"
+                        android:layout_weight="2"
+                        android:fontFamily="sans-serif"
+
+                        />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="30dp"
+                    >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="29sp"
+                        android:text="Description: "
+                        android:fontFamily="sans-serif"
+
+
+                        />
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No Description en getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:39.403  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:40.088  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:40.096  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:40.100  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:40.104  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/color/colors.xml
+06-17 08:43:40.108  18478-18478/com.iconuim.alc_project E/Resources﹕ IOException happened when getThemeColor, msg = assets/"
+
+                        android:layout_marginLeft="32dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="8dp"
+                        android:fontFamily="sans-serif"
+                        android:textSize="14sp"
+                        android:id="@+id/dialogDescriptionText"
+
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+
+</LinearLayout>
+
+<!-- android:orientation="horizontal"
+    android:background="@drawable/line" !-->

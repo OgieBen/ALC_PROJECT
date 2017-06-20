@@ -15,13 +15,13 @@
 <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#cdcdcd"
+    android:background="#CDC9C9"
     android:layout_marginTop="0dp"
     android:layout_marginBottom="0dp"
     android:gravity="center"
     android:text="Title"
     android:textSize="18sp"
-    android:textColor="#ffffff"
+    android:textColor="#fafafa"
     android:id="@android:id/text1"
     />
 

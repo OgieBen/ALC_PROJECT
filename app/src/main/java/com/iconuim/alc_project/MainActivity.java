@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.app.IntentService;
 import android.app.ListActivity;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,12 +19,18 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Path;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,27 +39,51 @@ import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Handler;
+import java.util.zip.Inflater;
+
+import static android.app.PendingIntent.getActivity;
 
 //import static com.iconuim.alc_project.R.id.displayDiaries;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
  {
 
-    public static ArrayList<String> titles = new ArrayList<>();
-     public static ArrayList<String> images = new ArrayList<>();
+     private static ArrayList<String> titles = new ArrayList<>();
+     private static ArrayList<String> images = new ArrayList<>();
+     private static ArrayList<String> description = new ArrayList<>();
+
+     private static int PIC_CAPTURE_INTENT = 300;
+     private static int SAVE_FILE = 400;
      MyAdapter myAdapter;
+     private static ProgressDialog dialog;
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
 
-         myAdapter = new MyAdapter(this,R.layout.cards, titles, images);
+         dialog = new ProgressDialog(MainActivity.this);
+         dialog.setMessage("Loading");
+         dialog.setCancelable(false);
+         dialog.setInverseBackgroundForced(false);
+         dialog.show();
+
+        // AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+         // Get the layout inflater
+        // LayoutInflater inflater = getActivity().getLayoutInflater();
+
+
+         myAdapter = new MyAdapter(this,R.layout.cards, titles, images,description);
          getLoaderManager().initLoader(0, null, this);
 
          ListView listView =  (ListView) findViewById(android.R.id.list);
@@ -90,19 +121,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
          //get db column
          int title = cursor.getColumnIndexOrThrow(PDDBOpenHelper.TITLE_COLUMN);
-         int description = cursor.getColumnIndexOrThrow(PDDBOpenHelper.DESCRIPTION_COLUMN);
+         int _description = cursor.getColumnIndexOrThrow(PDDBOpenHelper.DESCRIPTION_COLUMN);
          int imageRef = cursor.getColumnIndexOrThrow(PDDBOpenHelper.IMAGE_PATH_REF_COLUMN);
 
-
+            images.clear();
+            titles.clear();
          while (cursor.moveToNext())
          {
                  cursor.getCount();
                  Log.e("title ", "Title " + cursor.getString(imageRef));
                 titles.add(cursor.getString(title));
                 images.add(cursor.getString(imageRef));
+                description.add(cursor.getString(_description));
 
          }
          myAdapter.notifyDataSetChanged();
+         dialog.hide();
      }
 
      @Override
@@ -115,12 +149,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         private int resource;
         private ArrayList<String>  titles;
         private ArrayList<String> img;
+        private ArrayList<String> description;
+        Boolean bool = false;
 
-        public MyAdapter(Context context, int _resource, ArrayList<String> _titles,ArrayList<String> _img) {
+
+        public MyAdapter(Context context, int _resource, ArrayList<String> _titles,ArrayList<String> _img, ArrayList<String> _description) {
             super(context, _resource, _titles);
             resource =_resource;
            titles = _titles;
             img = _img;
+            description = _description;
+
+
         }
 
 
@@ -128,7 +168,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         public View getView(int position, View convertView, ViewGroup container) {
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(resource, container, false);
+
+
             }
+
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            View dView = inflater.inflate(R.layout.details_dialog,null);
+            builder.create();
+            builder.setView(dView);
 
 
             {
@@ -137,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 String filePath;
                 ContentResolver contentResolver = getContentResolver();
-
                 Cursor cur = contentResolver.query(uri, filePathColumn, null, null, null);
 
                 if (cur.moveToFirst()) {
@@ -146,13 +195,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     cur.close();
 
                     Bitmap image = BitmapFactory.decodeFile(filePath);
-                    ((ImageView) convertView.findViewById(android.R.id.icon)).setImageBitmap(image);
+                    ImageView addImage = ((ImageView) convertView.findViewById(android.R.id.icon));
+                    addImage.setImageBitmap(image);
+
+                    ((ImageView) dView.findViewById(R.id.dialogImage)).setImageBitmap(image);
+                    ((TextView) dView.findViewById(R.id.dialogTitleText))
+                            .setText(titles.get(position));
+                    ((TextView) dView.findViewById(R.id.dialogDescriptionText))
+                            .setText(description.get(position));
+
+
+
+                    if (bool == false) {
+                        addImage.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                              /*  builder.show();
+                                bool = true; */
+
+
+                            }
+
+                        });
+                    }else{
+
+                    }
                 }
 
             }
+
+
+
+
                 ((TextView) convertView.findViewById(android.R.id.text1))
                         .setText(titles.get(position));
-
+            if(!dView.hasFocus())
+            {
+                dView.onFinishTemporaryDetach();
+            }
 
             return convertView;
         }
@@ -174,8 +255,54 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+
+        switch(id)
+        {
+            case  R.id.action_settings:
+                return true;
+            case R.id.cam:
+
+                File imageFile;
+                   // if(hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if(intent.resolveActivity(getPackageManager())!= null) {
+
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String imageFileName = "JPEG_" + timeStamp + "_";
+                        try {
+                            File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                            imageFile = File.createTempFile( imageFileName, ".jpg", storage );
+                            String path = imageFile.getAbsolutePath();
+
+                            if(imageFile != null) {
+                                Uri imageUri = FileProvider.getUriForFile(this, "com.iconuim.alc_project.fileprovider", imageFile);
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                startActivityForResult(intent, SAVE_FILE);
+
+                              /*  Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                File openImagefile = new File(path);
+                                Uri imageFileUri = Uri.fromFile(openImagefile);
+                                mediaScanIntent.setData(imageFileUri);
+                                this.sendBroadcast(mediaScanIntent);
+                                */
+
+                            }
+                        }catch (IOException e)
+                        {
+
+                        }
+
+
+
+
+
+                        startActivityForResult(intent, PIC_CAPTURE_INTENT);
+                    }
+
+
+
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -193,4 +320,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onPause();
        // unregisterReceiver(pdBroadcast);
     }
-}
+
+     @Override
+     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+         super.onActivityResult(requestCode, resultCode, data);
+
+         if(requestCode == PIC_CAPTURE_INTENT && resultCode == RESULT_OK )
+         {
+             //final Intent intent = new Intent(this,AddToDiary.class);
+            // intent.putExtra("")
+           //  startActivity(intent);
+         }
+
+     }
+ }
