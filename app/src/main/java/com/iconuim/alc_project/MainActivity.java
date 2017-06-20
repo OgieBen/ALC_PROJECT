@@ -286,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 ContentResolver contentResolver = getContentResolver();
                 Cursor cur = contentResolver.query(uri, filePathColumn, null, null, null);
 
+
                 if (cur.moveToFirst()) {
                     int columnIndex = cur.getColumnIndexOrThrow(filePathColumn[0]);
                     filePath = cur.getString(columnIndex);

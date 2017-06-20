@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.iconuim.alc_project" >
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,6 +15,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,10 +62,7 @@
             android:name="android.hardware.camera"
             android:required="true" />
 
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-        <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-        <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+
 
 
         <provider
